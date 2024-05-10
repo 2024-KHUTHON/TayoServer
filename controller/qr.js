@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { encrypt, decrypt } = require("../service/aes");
-const { verifyToken } = require("./LoginController");
+const { loginRouter, verifyToken } = require("./LoginController");
 
 router.post("/issue/:id", verifyToken, (req, res) => {
     try {
