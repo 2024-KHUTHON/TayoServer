@@ -120,7 +120,7 @@ const usePoint = async (req, res) => {
 router.get('/remain', lc.verifyToken, pointRemain);
 router.get('/history/get', lc.verifyToken, pointGetHistory);
 router.get('/history/consume', lc.verifyToken, pointUseHistory);
-router.put('/get', lc.verifyToken, getPoint);
-router.put('/consume', lc.verifyToken, usePoint);
+router.post('/get', lc.verifyToken, getPoint);
+router.post('/consume', lc.verifyToken, usePoint);
 
 module.exports = router;
