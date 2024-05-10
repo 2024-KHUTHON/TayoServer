@@ -19,9 +19,9 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser("secret_password"));
 app.use(
-  express.urlencoded({
-    extended: true,
-  })
+    express.urlencoded({
+        extended: true,
+    })
 );
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -38,5 +38,5 @@ app.listen(PORT, HOST, () => {
     console.log(`[LOG] Server is running on ${PORT}`);
 });
 
-const loginRouter = require('./controller/LoginController')
-app.use('/users', loginRouter);
+const loginRouter = require("./controller/LoginController");
+app.use("/users", loginRouter.loginRouter);
