@@ -28,11 +28,15 @@ app.use(bodyParser.json());
 //# app 설정 공간
 
 const qrRouter = require("./controller/qr");
+const pointRouter = require("./controller/point");
+const profileRouter = require("./controller/profile");
 
 const HOST = "0.0.0.0";
 const PORT = 8855;
 
 app.use("/qr", qrRouter);
+app.use("/point", pointRouter);
+app.use("/profile", profileRouter);
 
 app.listen(PORT, HOST, () => {
     console.log(`[LOG] Server is running on ${PORT}`);
