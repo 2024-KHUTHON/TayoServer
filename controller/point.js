@@ -46,7 +46,7 @@ const pointUseHistory = async (req, res) => {
 
 const getPoint = async (req, res) => {
     console.log("this is point/get");
-    const user_id = req.user_id;
+    const user_id = req.params.user_id;
     const content = req.body.content;
     const point = req.body.point;
     
@@ -120,7 +120,7 @@ const usePoint = async (req, res) => {
 router.get('/remain', lc.verifyToken, pointRemain);
 router.get('/history/get', lc.verifyToken, pointGetHistory);
 router.get('/history/consume', lc.verifyToken, pointUseHistory);
-router.post('/get', lc.verifyToken, getPoint);
+router.post('/get/:user_id', getPoint);
 router.post('/consume', lc.verifyToken, usePoint);
 
 module.exports = router;
