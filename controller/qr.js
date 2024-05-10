@@ -1,9 +1,10 @@
 const router = require("express").Router();
 const { encrypt, decrypt } = require("../service/aes");
+const { verifyToken } = require("./LoginController");
 
-router.post("/issue/:id", (req, res) => {
+router.post("/issue/:id", verifyToken, (req, res) => {
     try {
-        const id = req.params.id;
+        const id = req.user_id;
         let userInfo = {
             user_id: id,
             publish_at: new Date().getTime(),
