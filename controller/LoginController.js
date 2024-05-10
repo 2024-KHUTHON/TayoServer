@@ -54,7 +54,7 @@ const createToken = async (req, res, next) => {
         try {
             if (ex && validPassword) {
                 const token = jwt.sign({ user_id: ex }, YOUR_SECRET_KEY, {
-                    expiresIn: "1h",
+                    expiresIn: "12h",
                 });
                 res.cookie("user", token);
                 console.log(res.cookie);
@@ -95,7 +95,6 @@ const createUser = async (body) => {
     } catch (error) {
         console.log(error);
     }
-    conn.release();
     //return signUpSuccess
 };
 

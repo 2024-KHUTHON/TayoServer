@@ -1,12 +1,13 @@
 const Router = require("express");
 const pool = require("../database/postgresql.js");
+const lc = require("../controller/LoginController.js");
 
 const router = Router();
 
 'use strict'
 const profile = async (req, res) => {
-    console.log("this is profile/:userId");
-    const user_id = req.params.userId;
+    console.log("this is profile/");
+    const user_id = req.user_id;
 
     const query = `select rank, nickname, exp from public.user where id = $1`;
     const rows = await pool.query(query, [user_id]);
@@ -19,6 +20,6 @@ const profile = async (req, res) => {
     });
 }
 
-router.get('/:userId', profile);
+router.get('/', lc.verifyToken, profile);
 
 module.exports = router;

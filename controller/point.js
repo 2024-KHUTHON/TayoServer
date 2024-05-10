@@ -1,12 +1,13 @@
 const express = require("express");
 const pool = require("../database/postgresql.js");
+const lc = require("../controller/LoginController.js");
 
 const router = express.Router();
 
 'use strict'
 const pointRemain = async (req, res) => {
-    console.log("this is point/remain/:userId");
-    const user_id = req.params.userId;
+    console.log("this is point/remain");
+    const user_id = req.user_id;
 
     const query = `select point from public.user where id = $1`;
     const rows = await pool.query(query, [user_id]);
@@ -18,36 +19,34 @@ const pointRemain = async (req, res) => {
 }
 
 const pointGetHistory = async (req, res) => {
-    console.log("this is point/get/:userId");
-    const user_id = req.params.userId;
+    console.log("this is point/history/get");
+    const user_id = req.user_id;
 
-    const query = `select * from public.history where id = $1 and type = true`;
-    const rows = await pool.query(query, [user_id]);
-    const query_result = rows.rows[0];
+    const query = `select point, content, created_at from public.history where user_id = $1 and type = $2`;
+    const rows = await pool.query(query, [user_id, "적립"]);
+    const query_result = rows.rows;
 
     return res.status(200).json({
-        // rows에 포인트 적립 내역 리스트로 들어가 있을 거니까 그거 반복 처리
-        point: query_result,
+        get_history: query_result
     });
 }
 
 const pointUseHistory = async (req, res) => {
-    console.log("this is point/use/:userId");
-    const user_id = req.params.userId;
+    console.log("this is point/history/consume");
+    const user_id = req.user_id;
 
-    const query = `select * from public.history where id = $1 and type = true`;
-    const rows = await pool.query(query, [user_id]);
-    const query_result = rows.rows[0];
+    const query = `select point, content, created_at from public.history where user_id = $1 and type = $2`;
+    const rows = await pool.query(query, [user_id, "사용"]);
+    const query_result = rows.rows;
     
     return res.status(200).json({
-        // rows에 포인트 사용 내역 리스트로 들어가 있을 거니까 그거 반복 처리
-        point: query_result,
+        consume_history: query_result,
     });
 }
 
 const getPoint = async (req, res) => {
     console.log("this is point/get");
-    const user_id = req.body.user_id;
+    const user_id = req.user_id;
     const content = req.body.content;
     const point = req.body.point;
     
@@ -75,8 +74,8 @@ const getPoint = async (req, res) => {
         await pool.query(updateExpQuery, [updatedExp, user_id]);
 
         // 포인트 적립 내역 추가
-        const getPointHistoryQuery = `insert into public.history (id, point, type, created_at) values ($1, $2, $3, $4)`;
-        await pool.query(getPointHistoryQuery, [user_id, point, true, new Date()]);
+        const getPointHistoryQuery = `insert into public.history (user_id, point, type, created_at, content) values ($1, $2, $3, $4, $5)`;
+        await pool.query(getPointHistoryQuery, [user_id, point, "적립", new Date(), content]);
 
     } catch (except) {
         return res.status(400).json({});
@@ -89,7 +88,7 @@ const getPoint = async (req, res) => {
 
 const usePoint = async (req, res) => {
     console.log("this is point/consume");
-    const user_id = req.body.user_id;
+    const user_id = req.user_id;
     const content = req.body.content;
     const point = req.body.point;
 
@@ -106,8 +105,8 @@ const usePoint = async (req, res) => {
         await pool.query(updatePointQuery, [updatedPoint, user_id]);
 
         // 포인트 사용 내역 추가
-        const getPointHistoryQuery = `insert into public.history (id, point, type, created_at) values ($1, $2, $3, $4)`;
-        await pool.query(getPointHistoryQuery, [user_id, point, false, new Date()]);
+        const getPointHistoryQuery = `insert into public.history (user_id, point, type, created_at, content) values ($1, $2, $3, $4, $5)`;
+        await pool.query(getPointHistoryQuery, [user_id, point, "사용", new Date(), content]);
 
     } catch (except) {
         return res.status(400).json({});
@@ -118,10 +117,10 @@ const usePoint = async (req, res) => {
     });
 }
 
-router.get('/remain/:userId', pointRemain);
-router.get('/get/:userId', pointGetHistory);
-router.get('/use/:userId', pointUseHistory);
-router.put('/get', getPoint);
-router.put('/put', usePoint);
+router.get('/remain', lc.verifyToken, pointRemain);
+router.get('/history/get', lc.verifyToken, pointGetHistory);
+router.get('/history/consume', lc.verifyToken, pointUseHistory);
+router.put('/get', lc.verifyToken, getPoint);
+router.put('/consume', lc.verifyToken, usePoint);
 
 module.exports = router;
